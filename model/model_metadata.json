@@ -24,43 +24,41 @@
   "category_options": {
     "General_Health": [
       "Excellent",
-      "Fair",
+      "Very good",
       "Good",
-      "Poor",
-      "Very Good"
+      "Fair",
+      "Poor"
     ],
     "Checkup": [
-      "5 or more years ago",
-      "Never",
+      "Within the past year",
       "Within the past 2 years",
       "Within the past 5 years",
-      "Within the past year"
+      "5 or more years ago"
     ],
     "Exercise": [
-      "No",
-      "Yes"
+      "Yes",
+      "No"
     ],
     "Skin_Cancer": [
-      "No",
-      "Yes"
+      "Yes",
+      "No"
     ],
     "Other_Cancer": [
-      "No",
-      "Yes"
+      "Yes",
+      "No"
     ],
     "Depression": [
-      "No",
-      "Yes"
+      "Yes",
+      "No"
     ],
     "Diabetes": [
       "No",
       "No, pre-diabetes or borderline diabetes",
-      "Yes",
-      "Yes, but female told only during pregnancy"
+      "Yes"
     ],
     "Arthritis": [
-      "No",
-      "Yes"
+      "Yes",
+      "No"
     ],
     "Sex": [
       "Female",
@@ -82,35 +80,35 @@
       "80+"
     ],
     "Smoking_History": [
-      "No",
-      "Yes"
+      "Yes",
+      "No"
     ]
   },
   "defaults": {
-    "General_Health": "Excellent",
-    "Checkup": "5 or more years ago",
-    "Exercise": "No",
+    "General_Health": "Good",
+    "Checkup": "Within the past year",
+    "Exercise": "Yes",
     "Skin_Cancer": "No",
     "Other_Cancer": "No",
     "Depression": "No",
     "Diabetes": "No",
     "Arthritis": "No",
     "Sex": "Female",
-    "Age_Category": "18-24",
+    "Age_Category": "45-49",
     "Smoking_History": "No",
-    "Height_(cm)": 170.0,
-    "Weight_(kg)": 81.65,
-    "BMI": 27.44,
-    "Alcohol_Consumption": 1.0,
-    "Fruit_Consumption": 30.0,
-    "Green_Vegetables_Consumption": 12.0,
-    "FriedPotato_Consumption": 4.0
+    "Height_(cm)": 168,
+    "Weight_(kg)": 75,
+    "BMI": 26.5,
+    "Alcohol_Consumption": 2,
+    "Fruit_Consumption": 30,
+    "Green_Vegetables_Consumption": 20,
+    "FriedPotato_Consumption": 2
   },
   "metrics": {
     "accuracy": 0.9191368117725146,
-    "precision": 0.49918166939443537,
+    "precision": 0.4992,
     "recall": 0.06107328794553464,
-    "f1": 0.10883140053523639,
+    "f1": 0.1088,
     "auroc": 0.8390080495982254,
     "confusion_matrix": [
       [

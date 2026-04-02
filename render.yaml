@@ -1,8 +1,7 @@
 services:
   - type: web
-    name: hospital-cvd-risk-screening
-    runtime: python
-    plan: free
+    name: cvd-hospital-app
+    env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:

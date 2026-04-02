@@ -1,38 +1,16 @@
-# Hospital CVD Risk Screening App
+# CardioSight Clinical Risk Console
 
-A GitHub-ready Flask project for **direct Render deployment**. It loads a saved Logistic Regression pipeline, accepts patient profile inputs, and returns the estimated probability of heart disease.
+A GitHub-ready Flask project for Render deployment. This app presents a polished hospital-style UI for cardiovascular disease risk screening using a saved machine learning pipeline.
 
-## Model summary
-- Accuracy: 0.9191
-- Precision: 0.4992
-- Recall: 0.0611
-- F1 score: 0.1088
-- AUROC: 0.8390
-- Confusion Matrix: [[56471, 306], [4689, 305]]
-
-## Repository structure
-```text
-.
-├── app.py
-├── requirements.txt
-├── render.yaml
-├── .python-version
-├── .gitignore
-├── model/
-│   ├── cvd_logreg_pipeline.joblib
-│   └── model_metadata.json
-├── templates/
-│   └── index.html
-├── static/
-│   └── styles.css
-├── scripts/
-│   ├── train_and_save_model.py
-│   └── anova_test_bmi_by_age.py
-├── notebooks/
-│   └── CVD_project_extended.ipynb
-└── data/
-    └── .gitkeep
-```
+## Deployment-ready files
+- `app.py`
+- `requirements.txt`
+- `.python-version`
+- `render.yaml`
+- `templates/index.html`
+- `static/styles.css`
+- `model/` (put the saved `.joblib` model here)
+- `model/model_metadata.json`
 
 ## Local run
 ```bash
@@ -44,25 +22,19 @@ python app.py
 ```
 
 ## Render deployment
-This repo is already set up for Render:
-- `render.yaml` included
-- build command: `pip install -r requirements.txt`
-- start command: `gunicorn app:app`
+1. Create a new GitHub repository.
+2. Upload the files in this folder.
+3. Commit and push.
+4. In Render, create a new Web Service from the GitHub repo.
+5. Render will read `render.yaml`, or you can set:
+   - Build command: `pip install -r requirements.txt`
+   - Start command: `gunicorn app:app`
 
-Push this folder to GitHub, then create a new Render web service from the repo.
+## Important
+The app works best when you place your trained model file here:
+`model/cvd_logreg_pipeline.joblib`
 
-## Full ANOVA test included
-See:
-- `scripts/anova_test_bmi_by_age.py`
+And the metadata file here:
+`model/model_metadata.json`
 
-This script:
-- states **H0** and **H1**
-- runs the ANOVA test
-- prints group means
-- makes a decision automatically:
-  - **Reject H0** if `p < 0.05`
-  - **Fail to reject H0** otherwise
-
-## Notes
-- The UI is designed with a clean navy-teal clinical palette, different from your capstone layout.
-- It is suitable for a hospital-style demo or screening workflow.
+If those files are missing, the UI will still open with demo fallback behavior, but real deployment should always include the saved model.

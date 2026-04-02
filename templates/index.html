@@ -3,97 +3,143 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hospital CVD Risk Screening</title>
+  <title>CardioSight Clinical Risk Console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <div class="shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="logo">HC</div>
+  <div class="app-shell">
+    <aside class="left-panel">
+      <div class="brand-block">
+        <div class="brand-icon">CS</div>
         <div>
-          <h1>Hospital CVD Risk Screening</h1>
-          <p>Professional interface for cardiovascular disease risk estimation.</p>
+          <p class="tiny-label">Clinical decision support</p>
+          <h1>CardioSight Clinical Risk Console</h1>
+          <p class="brand-copy">A hospital-style intake and cardiovascular disease screening interface designed for professional demonstration and deployment.</p>
         </div>
       </div>
 
-      <div class="metric">
-        <span>Accuracy</span>
-        <strong>{{ "%.4f"|format(metrics.accuracy) }}</strong>
-      </div>
-      <div class="metric">
-        <span>AUROC</span>
-        <strong>{{ "%.4f"|format(metrics.auroc) }}</strong>
-      </div>
-      <div class="metric">
-        <span>Recall</span>
-        <strong>{{ "%.4f"|format(metrics.recall) }}</strong>
-      </div>
-      <div class="metric">
-        <span>Precision</span>
-        <strong>{{ "%.4f"|format(metrics.precision) }}</strong>
+      <div class="metrics-stack">
+        <div class="metric-tile">
+          <span>Accuracy</span>
+          <strong>{{ "%.4f"|format(metrics.accuracy) }}</strong>
+        </div>
+        <div class="metric-tile">
+          <span>AUROC</span>
+          <strong>{{ "%.4f"|format(metrics.auroc) }}</strong>
+        </div>
+        <div class="metric-tile">
+          <span>Recall</span>
+          <strong>{{ "%.4f"|format(metrics.recall) }}</strong>
+        </div>
       </div>
 
-      <div class="clinical-note">
-        <h3>Clinical note</h3>
-        <p>This tool supports screening and should be used alongside clinician judgment, patient history, and hospital workflow.</p>
+      <div class="info-card">
+        <h3>Operational note</h3>
+        <p>This interface is intended for clinical screening support and project demonstration. Final care decisions should remain under clinician review.</p>
+      </div>
+
+      <div class="info-card muted">
+        <h3>Current model outcome</h3>
+        <ul>
+          <li>Precision: {{ "%.4f"|format(metrics.precision) }}</li>
+          <li>F1 Score: {{ "%.4f"|format(metrics.f1) }}</li>
+          <li>Confusion Matrix: [[{{ metrics.confusion_matrix[0][0] }}, {{ metrics.confusion_matrix[0][1] }}], [{{ metrics.confusion_matrix[1][0] }}, {{ metrics.confusion_matrix[1][1] }}]]</li>
+        </ul>
       </div>
     </aside>
 
-    <main class="content">
-      <section class="hero">
-        <p class="eyebrow">Patient Intake</p>
-        <h2>Enter patient profile information</h2>
-        <p class="subtext">The form is designed for a calm, professional hospital-style workflow and returns the estimated probability of heart disease.</p>
-      </section>
+    <main class="main-panel">
+      <header class="hero-card">
+        <div>
+          <p class="tiny-label">Patient intake</p>
+          <h2>Cardiovascular disease risk screening form</h2>
+          <p class="hero-copy">Enter a patient’s health profile to estimate cardiovascular disease risk using the saved model pipeline.</p>
+        </div>
+        <div class="hero-badge">Hospital-ready<br>UI concept</div>
+      </header>
 
-      <form method="POST" class="form-grid">
-        {% for col in categorical_cols %}
-        <div class="field">
-          <label for="{{ col }}">{{ col.replace('_', ' ') }}</label>
-          <select name="{{ col }}" id="{{ col }}">
-            {% for option in category_options[col] %}
-            <option value="{{ option }}" {% if submitted.get(col, defaults[col]) == option %}selected{% endif %}>{{ option }}</option>
+      <section class="content-grid">
+        <form method="POST" class="intake-card">
+          <div class="section-head">
+            <h3>Patient profile inputs</h3>
+            <p>Structured inputs selected from the BRFSS cardiovascular dataset.</p>
+          </div>
+
+          <div class="fields-grid">
+            {% for col in categorical_cols %}
+            <div class="field">
+              <label for="{{ col }}">{{ col.replace('_', ' ') }}</label>
+              <select name="{{ col }}" id="{{ col }}">
+                {% for option in category_options[col] %}
+                <option value="{{ option }}" {% if submitted.get(col, defaults[col]) == option %}selected{% endif %}>{{ option }}</option>
+                {% endfor %}
+              </select>
+            </div>
             {% endfor %}
-          </select>
-        </div>
-        {% endfor %}
 
-        {% for col in numeric_cols %}
-        <div class="field">
-          <label for="{{ col }}">{{ col.replace('_', ' ') }}</label>
-          <input type="number" step="any" name="{{ col }}" id="{{ col }}" value="{{ submitted.get(col, defaults[col]) }}">
-        </div>
-        {% endfor %}
+            {% for col in numeric_cols %}
+            <div class="field">
+              <label for="{{ col }}">{{ col.replace('_', ' ') }}</label>
+              <input type="number" step="any" name="{{ col }}" id="{{ col }}" value="{{ submitted.get(col, defaults[col]) }}">
+            </div>
+            {% endfor %}
+          </div>
 
-        <div class="actions">
-          <button type="submit">Run Prediction</button>
-        </div>
-      </form>
+          <div class="actions">
+            <button type="submit">Run Risk Prediction</button>
+          </div>
+        </form>
 
-      {% if probability is not none %}
-      <section class="result-card">
-        <div class="result-head">
-          <div>
-            <p class="eyebrow">Prediction Result</p>
-            <h3>{{ prediction }}</h3>
-            <p class="subtext">Estimated probability of heart disease generated by the saved logistic regression pipeline.</p>
+        <section class="results-column">
+          <div class="result-card primary">
+            <div class="section-head">
+              <h3>Screening outcome</h3>
+              <p>Probability-based model output using the current patient profile.</p>
+            </div>
+
+            {% if prediction %}
+            <div class="result-top">
+              <div>
+                <div class="tiny-label">Prediction</div>
+                <h2>{{ prediction }}</h2>
+                <p class="result-copy">{{ risk_band }} based on current model threshold and estimated heart disease probability.</p>
+              </div>
+              <div class="risk-pill {% if probability >= 0.7 %}high{% elif probability >= 0.4 %}moderate{% else %}low{% endif %}">
+                {{ "%.1f"|format(probability * 100) }}%
+              </div>
+            </div>
+
+            <div class="meter">
+              <div class="meter-fill {% if probability >= 0.7 %}high{% elif probability >= 0.4 %}moderate{% else %}low{% endif %}" style="width: {{ probability * 100 }}%"></div>
+            </div>
+            <div class="meter-labels">
+              <span>Lower</span>
+              <span>Moderate</span>
+              <span>Higher</span>
+            </div>
+            {% else %}
+            <div class="empty-state">
+              <p>Submit the form to display the patient’s predicted cardiovascular disease risk.</p>
+            </div>
+            {% endif %}
           </div>
-          <div class="risk-chip {% if probability >= 0.5 %}high{% else %}low{% endif %}">
-            {{ "%.2f"|format(probability * 100) }}%
+
+          <div class="result-card secondary">
+            <div class="section-head">
+              <h3>Clinical interpretation guide</h3>
+              <p>Suggested wording for a hospital-style workflow.</p>
+            </div>
+            <ul class="interpret-list">
+              <li><strong>Lower Risk:</strong> continue routine monitoring and preventive counselling.</li>
+              <li><strong>Moderate Risk:</strong> review lifestyle and clinical factors more closely.</li>
+              <li><strong>High Risk:</strong> consider enhanced review, further assessment, and clinician follow-up.</li>
+            </ul>
           </div>
-        </div>
-        <div class="bar-wrap">
-          <div class="bar">
-            <div class="fill {% if probability >= 0.5 %}high{% else %}low{% endif %}" style="width: {{ probability * 100 }}%"></div>
-          </div>
-          <div class="legend"><span>Lower risk</span><span>Higher risk</span></div>
-        </div>
+        </section>
       </section>
-      {% endif %}
     </main>
   </div>
 </body>
