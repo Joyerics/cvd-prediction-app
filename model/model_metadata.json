@@ -1,0 +1,126 @@
+{
+  "categorical_cols": [
+    "General_Health",
+    "Checkup",
+    "Exercise",
+    "Skin_Cancer",
+    "Other_Cancer",
+    "Depression",
+    "Diabetes",
+    "Arthritis",
+    "Sex",
+    "Age_Category",
+    "Smoking_History"
+  ],
+  "numeric_cols": [
+    "Height_(cm)",
+    "Weight_(kg)",
+    "BMI",
+    "Alcohol_Consumption",
+    "Fruit_Consumption",
+    "Green_Vegetables_Consumption",
+    "FriedPotato_Consumption"
+  ],
+  "category_options": {
+    "General_Health": [
+      "Excellent",
+      "Fair",
+      "Good",
+      "Poor",
+      "Very Good"
+    ],
+    "Checkup": [
+      "5 or more years ago",
+      "Never",
+      "Within the past 2 years",
+      "Within the past 5 years",
+      "Within the past year"
+    ],
+    "Exercise": [
+      "No",
+      "Yes"
+    ],
+    "Skin_Cancer": [
+      "No",
+      "Yes"
+    ],
+    "Other_Cancer": [
+      "No",
+      "Yes"
+    ],
+    "Depression": [
+      "No",
+      "Yes"
+    ],
+    "Diabetes": [
+      "No",
+      "No, pre-diabetes or borderline diabetes",
+      "Yes",
+      "Yes, but female told only during pregnancy"
+    ],
+    "Arthritis": [
+      "No",
+      "Yes"
+    ],
+    "Sex": [
+      "Female",
+      "Male"
+    ],
+    "Age_Category": [
+      "18-24",
+      "25-29",
+      "30-34",
+      "35-39",
+      "40-44",
+      "45-49",
+      "50-54",
+      "55-59",
+      "60-64",
+      "65-69",
+      "70-74",
+      "75-79",
+      "80+"
+    ],
+    "Smoking_History": [
+      "No",
+      "Yes"
+    ]
+  },
+  "defaults": {
+    "General_Health": "Excellent",
+    "Checkup": "5 or more years ago",
+    "Exercise": "No",
+    "Skin_Cancer": "No",
+    "Other_Cancer": "No",
+    "Depression": "No",
+    "Diabetes": "No",
+    "Arthritis": "No",
+    "Sex": "Female",
+    "Age_Category": "18-24",
+    "Smoking_History": "No",
+    "Height_(cm)": 170.0,
+    "Weight_(kg)": 81.65,
+    "BMI": 27.44,
+    "Alcohol_Consumption": 1.0,
+    "Fruit_Consumption": 30.0,
+    "Green_Vegetables_Consumption": 12.0,
+    "FriedPotato_Consumption": 4.0
+  },
+  "metrics": {
+    "accuracy": 0.9191368117725146,
+    "precision": 0.49918166939443537,
+    "recall": 0.06107328794553464,
+    "f1": 0.10883140053523639,
+    "auroc": 0.8390080495982254,
+    "confusion_matrix": [
+      [
+        56471,
+        306
+      ],
+      [
+        4689,
+        305
+      ]
+    ]
+  }
+}
