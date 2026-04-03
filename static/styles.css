@@ -82,12 +82,6 @@ body{
   font-weight:600;
   color:#0d7a73;
 }
-.risk-note{
-  margin-top:8px;
-  font-size:12px;
-  line-height:1.5;
-  color:#8a5a14;
-}
 .info-wrap{
   position:relative;
   display:inline-flex;
