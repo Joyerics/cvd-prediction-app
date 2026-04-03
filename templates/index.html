@@ -17,37 +17,24 @@
         <div>
           <p class="tiny-label">Clinical decision support</p>
           <h1>CardioSight Clinical Risk Console</h1>
-          <p class="brand-copy">A hospital-style intake and cardiovascular disease screening interface designed for professional demonstration and deployment.</p>
+          <p class="brand-copy">Professional cardiovascular disease screening interface for hospital-style use.</p>
         </div>
       </div>
 
       <div class="metrics-stack">
-        <div class="metric-tile">
-          <span>Accuracy</span>
-          <strong>{{ "%.4f"|format(metrics.accuracy) }}</strong>
-        </div>
-        <div class="metric-tile">
-          <span>AUROC</span>
-          <strong>{{ "%.4f"|format(metrics.auroc) }}</strong>
-        </div>
-        <div class="metric-tile">
-          <span>Recall</span>
-          <strong>{{ "%.4f"|format(metrics.recall) }}</strong>
-        </div>
+        <div class="metric-tile"><span>Accuracy</span><strong>{{ "%.4f"|format(metrics.accuracy) }}</strong></div>
+        <div class="metric-tile"><span>AUROC</span><strong>{{ "%.4f"|format(metrics.auroc) }}</strong></div>
+        <div class="metric-tile"><span>Recall</span><strong>{{ "%.4f"|format(metrics.recall) }}</strong></div>
       </div>
 
       <div class="info-card">
         <h3>Operational note</h3>
-        <p>This interface is intended for clinical screening support and project demonstration. Final care decisions should remain under clinician review.</p>
+        <p>This tool supports screening and demonstration. Final patient decisions should remain under clinician review.</p>
       </div>
 
-      <div class="info-card muted">
-        <h3>Current model outcome</h3>
-        <ul>
-          <li>Precision: {{ "%.4f"|format(metrics.precision) }}</li>
-          <li>F1 Score: {{ "%.4f"|format(metrics.f1) }}</li>
-          <li>Confusion Matrix: [[{{ metrics.confusion_matrix[0][0] }}, {{ metrics.confusion_matrix[0][1] }}], [{{ metrics.confusion_matrix[1][0] }}, {{ metrics.confusion_matrix[1][1] }}]]</li>
-        </ul>
+      <div class="info-card">
+        <h3>Input interpretation</h3>
+        <p>Fields with the info icon use dataset definitions. Consumption fields are frequencies over the <strong>past 30 days</strong>, and the UI shows an automatic daily average below the field.</p>
       </div>
     </aside>
 
@@ -56,34 +43,97 @@
         <div>
           <p class="tiny-label">Patient intake</p>
           <h2>Cardiovascular disease risk screening form</h2>
-          <p class="hero-copy">Enter a patient’s health profile to estimate cardiovascular disease risk using the saved model pipeline.</p>
+          <p class="hero-copy">Enter a patient’s health profile to estimate cardiovascular disease risk.</p>
         </div>
-        <div class="hero-badge">Hospital-ready<br>UI concept</div>
+        <div class="hero-badge">Hospital-ready<br>UI</div>
       </header>
 
       <section class="content-grid">
         <form method="POST" class="intake-card">
           <div class="section-head">
             <h3>Patient profile inputs</h3>
-            <p>Structured inputs selected from the BRFSS cardiovascular dataset.</p>
+            <p>Structured fields based on the BRFSS cardiovascular dataset.</p>
           </div>
 
           <div class="fields-grid">
             {% for col in categorical_cols %}
             <div class="field">
-              <label for="{{ col }}">{{ col.replace('_', ' ') }}</label>
+              <label for="{{ col }}">
+                {% if col == "General_Health" %}
+                  General Health
+                {% elif col == "Checkup" %}
+                  Recent Checkup
+                {% elif col == "Smoking_History" %}
+                  Smoking History
+                {% else %}
+                  {{ col.replace('_', ' ') }}
+                {% endif %}
+
+                {% if col == "General_Health" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Self-rated overall health status reported by the patient.</span></span>
+                {% elif col == "Checkup" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">How recently the patient had a routine medical checkup.</span></span>
+                {% elif col == "Exercise" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Indicates whether the patient reported physical exercise or activity.</span></span>
+                {% elif col == "Diabetes" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Diabetes status is strongly related to cardiovascular risk in the model.</span></span>
+                {% elif col == "Smoking_History" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Smoking history is a known cardiovascular risk factor and is used directly in the model.</span></span>
+                {% elif col == "Age_Category" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Older age categories generally increase predicted cardiovascular disease risk.</span></span>
+                {% endif %}
+              </label>
+
               <select name="{{ col }}" id="{{ col }}">
                 {% for option in category_options[col] %}
                 <option value="{{ option }}" {% if submitted.get(col, defaults[col]) == option %}selected{% endif %}>{{ option }}</option>
                 {% endfor %}
               </select>
+
+              <div class="risk-note" id="{{ col }}_risk_note"></div>
             </div>
             {% endfor %}
 
             {% for col in numeric_cols %}
             <div class="field">
-              <label for="{{ col }}">{{ col.replace('_', ' ') }}</label>
+              <label for="{{ col }}">
+                {% if col == "Alcohol_Consumption" %}
+                  Alcohol Consumption (past 30 days)
+                {% elif col == "Fruit_Consumption" %}
+                  Fruit Consumption (past 30 days)
+                {% elif col == "Green_Vegetables_Consumption" %}
+                  Green Vegetables Consumption (past 30 days)
+                {% elif col == "FriedPotato_Consumption" %}
+                  Fried Potato Consumption (past 30 days)
+                {% elif col == "Height_(cm)" %}
+                  Height (cm)
+                {% elif col == "Weight_(kg)" %}
+                  Weight (kg)
+                {% else %}
+                  {{ col.replace('_', ' ') }}
+                {% endif %}
+
+                {% if col == "Alcohol_Consumption" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Reported as frequency over the past 30 days. A daily average is shown automatically below.</span></span>
+                {% elif col == "Fruit_Consumption" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Reported as frequency over the past 30 days. A daily average is shown automatically below.</span></span>
+                {% elif col == "Green_Vegetables_Consumption" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Reported as frequency over the past 30 days. A daily average is shown automatically below.</span></span>
+                {% elif col == "FriedPotato_Consumption" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Reported as frequency over the past 30 days. A daily average is shown automatically below.</span></span>
+                {% elif col == "BMI" %}
+                  <span class="info-wrap"><span class="info-icon" tabindex="0">ⓘ</span><span class="tooltip">Body Mass Index is an important model input. Higher BMI often increases predicted cardiovascular disease risk.</span></span>
+                {% endif %}
+              </label>
+
               <input type="number" step="any" name="{{ col }}" id="{{ col }}" value="{{ submitted.get(col, defaults[col]) }}">
+
+              {% if col in ["Alcohol_Consumption", "Fruit_Consumption", "Green_Vegetables_Consumption", "FriedPotato_Consumption"] %}
+              <small class="field-hint">Frequency based on past 30 days</small>
+              <div class="daily-conversion" id="{{ col }}_daily"></div>
+              {% endif %}
+
+              <div class="risk-note" id="{{ col }}_risk_note"></div>
             </div>
             {% endfor %}
           </div>
@@ -97,7 +147,7 @@
           <div class="result-card primary">
             <div class="section-head">
               <h3>Screening outcome</h3>
-              <p>Probability-based model output using the current patient profile.</p>
+              <p>Probability-based output using the current patient profile.</p>
             </div>
 
             {% if prediction %}
@@ -105,7 +155,7 @@
               <div>
                 <div class="tiny-label">Prediction</div>
                 <h2>{{ prediction }}</h2>
-                <p class="result-copy">{{ risk_band }} based on current model threshold and estimated heart disease probability.</p>
+                <p class="result-copy">{{ risk_band }} based on the estimated probability.</p>
               </div>
               <div class="risk-pill {% if probability >= 0.7 %}high{% elif probability >= 0.4 %}moderate{% else %}low{% endif %}">
                 {{ "%.1f"|format(probability * 100) }}%
@@ -116,13 +166,11 @@
               <div class="meter-fill {% if probability >= 0.7 %}high{% elif probability >= 0.4 %}moderate{% else %}low{% endif %}" style="width: {{ probability * 100 }}%"></div>
             </div>
             <div class="meter-labels">
-              <span>Lower</span>
-              <span>Moderate</span>
-              <span>Higher</span>
+              <span>Lower</span><span>Moderate</span><span>Higher</span>
             </div>
             {% else %}
             <div class="empty-state">
-              <p>Submit the form to display the patient’s predicted cardiovascular disease risk.</p>
+              <p>Submit the form to display the patient’s estimated cardiovascular disease risk.</p>
             </div>
             {% endif %}
           </div>
@@ -130,17 +178,170 @@
           <div class="result-card secondary">
             <div class="section-head">
               <h3>Clinical interpretation guide</h3>
-              <p>Suggested wording for a hospital-style workflow.</p>
+              <p>Suggested workflow language for demonstration use.</p>
             </div>
             <ul class="interpret-list">
               <li><strong>Lower Risk:</strong> continue routine monitoring and preventive counselling.</li>
-              <li><strong>Moderate Risk:</strong> review lifestyle and clinical factors more closely.</li>
+              <li><strong>Moderate Risk:</strong> review patient history and lifestyle factors more closely.</li>
               <li><strong>High Risk:</strong> consider enhanced review, further assessment, and clinician follow-up.</li>
             </ul>
+          </div>
+
+          <div class="result-card secondary">
+            <div class="section-head">
+              <h3>Dynamic input explanations</h3>
+              <p>These explanations update automatically as a user changes inputs.</p>
+            </div>
+            <div id="dynamic-explanations" class="dynamic-explanations">
+              <p class="muted-copy">Change inputs to see field-level risk interpretation.</p>
+            </div>
           </div>
         </section>
       </section>
     </main>
   </div>
+
+  <script>
+    function formatDailyValue(value) {
+      if (isNaN(value) || value === "") return "";
+      return (Number(value) / 30).toFixed(2);
+    }
+
+    function setText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    function updateMonthlyToDaily() {
+      const monthlyFields = [
+        "Alcohol_Consumption",
+        "Fruit_Consumption",
+        "Green_Vegetables_Consumption",
+        "FriedPotato_Consumption"
+      ];
+
+      monthlyFields.forEach(field => {
+        const input = document.getElementById(field);
+        const output = document.getElementById(field + "_daily");
+        if (input && output) {
+          const val = input.value;
+          output.textContent = val !== "" ? "Approximate daily average: " + formatDailyValue(val) + " per day" : "";
+        }
+      });
+    }
+
+    function updateRiskNotes() {
+      const bmi = parseFloat(document.getElementById("BMI")?.value || "");
+      const age = document.getElementById("Age_Category")?.value || "";
+      const smoke = document.getElementById("Smoking_History")?.value || "";
+      const diabetes = document.getElementById("Diabetes")?.value || "";
+      const exercise = document.getElementById("Exercise")?.value || "";
+      const generalHealth = document.getElementById("General_Health")?.value || "";
+
+      setText("BMI_risk_note",
+        !isNaN(bmi) ? (bmi >= 30 ? "Risk note: BMI is in a higher-risk range for cardiovascular disease."
+          : bmi >= 25 ? "Risk note: BMI is above normal and may moderately increase cardiovascular risk."
+          : "Risk note: BMI is in a lower-risk range.") : ""
+      );
+
+      setText("Age_Category_risk_note",
+        age ? (["60-64","65-69","70-74","75-79","80+"].includes(age)
+          ? "Risk note: Older age category is associated with higher cardiovascular risk."
+          : ["50-54","55-59"].includes(age)
+          ? "Risk note: Mid-to-late age category may increase cardiovascular risk."
+          : "Risk note: Younger age category generally indicates lower cardiovascular risk.") : ""
+      );
+
+      setText("Smoking_History_risk_note",
+        smoke ? (smoke === "Yes"
+          ? "Risk note: Smoking history increases cardiovascular disease risk."
+          : "Risk note: No smoking history reduces one major cardiovascular risk factor.") : ""
+      );
+
+      setText("Diabetes_risk_note",
+        diabetes ? (diabetes !== "No"
+          ? "Risk note: Diabetes or pre-diabetes is strongly associated with higher cardiovascular risk."
+          : "Risk note: No diabetes reported.") : ""
+      );
+
+      setText("Exercise_risk_note",
+        exercise ? (exercise === "No"
+          ? "Risk note: Low exercise level may increase cardiovascular risk."
+          : "Risk note: Reported exercise is protective and may reduce cardiovascular risk.") : ""
+      );
+
+      setText("General_Health_risk_note",
+        generalHealth ? (["Fair","Poor"].includes(generalHealth)
+          ? "Risk note: Lower self-rated general health is associated with increased cardiovascular risk."
+          : "Risk note: Better self-rated health is generally associated with lower cardiovascular risk.") : ""
+      );
+
+      const box = document.getElementById("dynamic-explanations");
+      if (box) {
+        const items = [];
+
+        if (!isNaN(bmi)) {
+          items.push(`<div class="explain-item"><strong>BMI:</strong> ${
+            bmi >= 30 ? "High BMI may meaningfully increase model-estimated risk." :
+            bmi >= 25 ? "BMI is mildly elevated and may contribute to moderate risk." :
+            "BMI appears lower and is less likely to drive risk upward."
+          }</div>`);
+        }
+
+        if (age) {
+          items.push(`<div class="explain-item"><strong>Age:</strong> ${
+            ["60-64","65-69","70-74","75-79","80+"].includes(age)
+              ? "Older age categories often contribute strongly to predicted cardiovascular risk."
+              : ["50-54","55-59"].includes(age)
+              ? "This age group can contribute moderately to risk."
+              : "This age group usually contributes less risk than older categories."
+          }</div>`);
+        }
+
+        if (smoke) {
+          items.push(`<div class="explain-item"><strong>Smoking history:</strong> ${
+            smoke === "Yes"
+              ? "Smoking history is a known cardiovascular risk factor and usually raises predicted risk."
+              : "No smoking history removes one major lifestyle-related risk factor."
+          }</div>`);
+        }
+
+        if (diabetes) {
+          items.push(`<div class="explain-item"><strong>Diabetes:</strong> ${
+            diabetes !== "No"
+              ? "Diabetes-related status is one of the strongest cardiovascular risk indicators in screening contexts."
+              : "No diabetes reported, which is favorable for risk assessment."
+          }</div>`);
+        }
+
+        if (exercise) {
+          items.push(`<div class="explain-item"><strong>Exercise:</strong> ${
+            exercise === "No"
+              ? "Low physical activity may push risk upward."
+              : "Reported exercise may support a lower-risk profile."
+          }</div>`);
+        }
+
+        box.innerHTML = items.length ? items.join("") : '<p class="muted-copy">Change inputs to see field-level risk interpretation.</p>';
+      }
+    }
+
+    function bindLiveUpdates() {
+      document.querySelectorAll("input, select").forEach(el => {
+        el.addEventListener("input", () => {
+          updateMonthlyToDaily();
+          updateRiskNotes();
+        });
+        el.addEventListener("change", () => {
+          updateMonthlyToDaily();
+          updateRiskNotes();
+        });
+      });
+    }
+
+    updateMonthlyToDaily();
+    updateRiskNotes();
+    bindLiveUpdates();
+  </script>
 </body>
 </html>

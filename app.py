@@ -13,12 +13,17 @@ META_PATH = BASE_DIR / "model" / "model_metadata.json"
 model = None
 meta = None
 
-if MODEL_PATH.exists() and META_PATH.exists():
-    model = joblib.load(MODEL_PATH)
+if META_PATH.exists():
     meta = json.loads(META_PATH.read_text(encoding="utf-8"))
 
-def load_demo_metadata():
-    return {
+if MODEL_PATH.exists():
+    try:
+        model = joblib.load(MODEL_PATH)
+    except Exception:
+        model = None
+
+if meta is None:
+    meta = {
         "categorical_cols": [
             "General_Health", "Checkup", "Exercise", "Skin_Cancer", "Other_Cancer",
             "Depression", "Diabetes", "Arthritis", "Sex", "Age_Category", "Smoking_History"
@@ -70,9 +75,6 @@ def load_demo_metadata():
         }
     }
 
-if meta is None:
-    meta = load_demo_metadata()
-
 categorical_cols = meta["categorical_cols"]
 numeric_cols = meta["numeric_cols"]
 category_options = meta["category_options"]
@@ -90,6 +92,39 @@ def build_input_dataframe(form_data):
             row[col] = float(defaults[col])
     return pd.DataFrame([row])
 
+def fallback_probability(form_data):
+    bmi = float(form_data.get("BMI", defaults["BMI"]))
+    age = form_data.get("Age_Category", defaults["Age_Category"])
+    smoke = form_data.get("Smoking_History", defaults["Smoking_History"])
+    diabetes = form_data.get("Diabetes", defaults["Diabetes"])
+    exercise = form_data.get("Exercise", defaults["Exercise"])
+    general_health = form_data.get("General_Health", defaults["General_Health"])
+
+    score = 0.12
+    if bmi >= 30:
+        score += 0.18
+    elif bmi >= 25:
+        score += 0.08
+
+    if age in ["60-64", "65-69", "70-74", "75-79", "80+"]:
+        score += 0.18
+    elif age in ["50-54", "55-59"]:
+        score += 0.10
+
+    if smoke == "Yes":
+        score += 0.10
+
+    if diabetes != "No":
+        score += 0.22
+
+    if exercise == "No":
+        score += 0.08
+
+    if general_health in ["Fair", "Poor"]:
+        score += 0.10
+
+    return min(max(score, 0.03), 0.95)
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     prediction = None
@@ -103,24 +138,7 @@ def index():
             X = build_input_dataframe(request.form)
             probability = float(model.predict_proba(X)[:, 1][0])
         else:
-            bmi = float(request.form.get("BMI", defaults["BMI"]))
-            age = request.form.get("Age_Category", defaults["Age_Category"])
-            smoke = request.form.get("Smoking_History", defaults["Smoking_History"])
-            diabetes = request.form.get("Diabetes", defaults["Diabetes"])
-            score = 0.18
-            if bmi >= 30:
-                score += 0.18
-            elif bmi >= 25:
-                score += 0.08
-            if age in ["60-64", "65-69", "70-74", "75-79", "80+"]:
-                score += 0.18
-            elif age in ["50-54", "55-59"]:
-                score += 0.10
-            if smoke == "Yes":
-                score += 0.10
-            if diabetes != "No":
-                score += 0.22
-            probability = min(max(score, 0.03), 0.95)
+            probability = fallback_probability(request.form)
 
         if probability >= 0.70:
             risk_band = "High Risk"
