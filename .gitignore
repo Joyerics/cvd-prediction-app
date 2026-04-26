@@ -1,0 +1,56 @@
+# Python
+
+**pycache**/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+
+venv/
+env/
+.env
+
+# Jupyter Notebook
+
+.ipynb_checkpoints/
+
+# Data files (avoid uploading large/sensitive data)
+
+data/*.csv
+data/*.xlsx
+
+# Model files (optional - include if small)
+
+*.pkl
+*.joblib
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# Logs
+
+*.log
+
+# Build / dist
+
+build/
+dist/
+*.egg-info/
+
+# IDE
+
+.vscode/
+.idea/
+
+# Render / deployment
+
+.env
+.env.*
+
+# Temporary files
+
+*.tmp
+*.bak
